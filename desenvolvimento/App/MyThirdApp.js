@@ -4,8 +4,11 @@ var MyThirdApp = cc.Layer.extend(
     world:null,
     playerBody:null,
     flyingVelocity:0,
+    rotationAmount:0,
     ctor:function(){
 	flyingVelocity = 0;
+	this._jetSprite = new JetSprite();
+	rotationAmount = 0;
 	
 	var b2Vec2 = Box2D.Common.Math.b2Vec2
 		, b2BodyDef = Box2D.Dynamics.b2BodyDef
@@ -42,11 +45,15 @@ var MyThirdApp = cc.Layer.extend(
     },
     init:function(){
 	this._super();
+	
+        this._jetSprite.schedule(function()
+            {
+                //this.setRotation(playerBody.GetLinearVelocity().y * -3);
+            });
         return true;
     },
     addNewSpriteWithCoords:function (p) {
      
-	this._jetSprite = new JetSprite();
 	this.setTouchEnabled(true);
 	this.setKeyboardEnabled(true);
 
@@ -85,12 +92,10 @@ var MyThirdApp = cc.Layer.extend(
         this._super();
     },
     onKeyDown:function(e){
-        
-	if(flyingVelocity < 0.25)
-	    flyingVelocity += 0.05;
+	    flyingVelocity = 0.3;
     },
     onKeyUp:function(e){
-	flyingVelocity = 0.01;
+	flyingVelocity = 0;
     },
     update:function (dt) {
         //It is recommended that a fixed time step is used with Box2D for stability
@@ -115,9 +120,8 @@ var MyThirdApp = cc.Layer.extend(
                 //console.log(b.GetAngle());
             }
         }
-
-	
-	playerBody.ApplyImpulse(cc.p(0,flyingVelocity),playerBody.GetPosition());
+	if(playerBody.GetLinearVelocity().y < 3.5)
+	    playerBody.ApplyImpulse(cc.p(0,flyingVelocity),playerBody.GetPosition());
 
     }
 });
