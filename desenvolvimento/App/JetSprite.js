@@ -1,7 +1,5 @@
 var JetSprite = cc.Sprite.extend({
-    ctor:function(){
-	this._verticalVelocity = 5;
+    ctor:function(){	
         this.initWithFile("images/jet.png");
-	this.setPosition(new cc.Point(150,150));
     }
 });
