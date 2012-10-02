@@ -1,15 +1,20 @@
-var JetSprite = cc.Sprite.extend({
+var GroundSprite = cc.Sprite.extend({
+    vertices: null,
+    color:0,
+    rgb:"",
     ctor:function(){
-	this._verticalVelocity = 5;
-        this.initWithFile("images/jet.png");
 	this.setPosition(new cc.Point(150,150));
+	this.color = 0;//Math.floor((Math.random()*255)+1);
+	this.rgb = "rgba("+this.color+","+this.color+","+this.color+",1)";
+    },
+    setVertices:function(p_vertices){
+	this.vertices = p_vertices
     },
     draw:function(){
 	this._super();
-	cc.renderContext.fillStyle = "rgba(255,255,255,1)";
-        cc.renderContext.strokeStyle = "rgba(255,255,255,1)";
-        cc.drawingUtil.drawLine(cc.p(0, 0), cc.p(100, 100));
-
+	
+	cc.renderContext.fillStyle = this.rgb;
+        cc.renderContext.strokeStyle = "rgba(0,0,0,1)";
+        cc.drawingUtil.drawPoly(this.vertices, 3, true, true)
     }
-    
 });
