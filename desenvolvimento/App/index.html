@@ -1,9 +1,65 @@
 <html>
-<body style="padding:0; margin: 0; background: #fff;">
-<div style="text-align: center; font-size: 0">
-	<canvas id="gameCanvas" width="600" height="600">
-		Your browser does not support the canvas tag
-	</canvas>
+<head>
+    <meta charset="utf-8">
+    <title>Cave Escaping</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="Cave Escaping" content="">
+    <meta name="Eduardo Vale" content="">
+
+    <!-- Le styles -->
+    <link href="./css/bootstrap.css" rel="stylesheet">
+    <link href="./css/bootstrap-responsive.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+      #gameCanvas {
+	background-color: #AD1F1F;
+      }
+      .hero-unit{
+	padding: 60px 135px 60px 135px;
+      }
+    </style>
+    
+  </head>
+	
+<body style="padding:0; margin: 0;">
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+	  <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+	  <span class="icon-bar"></span>
+	  <span class="icon-bar"></span>
+	  <span class="icon-bar"></span>
+	  </a>
+          <a class="brand" href="#">Est‡gio I</a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="container">
+
+      <!-- Main hero unit for a primary marketing message or call to action -->
+      <div class="hero-unit">
+        <h1>Cave Escaping!</h1>
+        <p>How long can you survive?</p>
+	<div id="gameContainer">
+	  <canvas id="gameCanvas" width="900px" height="500px">
+	   Your browser does not support the canvas tag
+	  </canvas>
+	</div>
+      </div>
+
+      <hr>
+
+      <footer>
+        <p>© Company 2012</p>
+      </footer>
+
+    </div>
+<div style="margin: 30px; font-size: 0">
+    
 </div>
 </body>
 </html>
