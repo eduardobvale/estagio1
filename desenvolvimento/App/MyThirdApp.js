@@ -6,6 +6,8 @@ var MyThirdApp = cc.Layer.extend(
     flyingVelocity:0,
     rotationAmount:0,
     _groundElements:null,
+    _groundManager:null,
+    _velocity:-0.5,
     ctor:function(){
 
 	flyingVelocity = 0;
@@ -18,15 +20,26 @@ var MyThirdApp = cc.Layer.extend(
 		, b2Body = Box2D.Dynamics.b2Body
 		, b2FixtureDef = Box2D.Dynamics.b2FixtureDef
 		, b2World = Box2D.Dynamics.b2World
-		, b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape;
-	    
-	var screenSize = cc.Director.getInstance().getWinSize();
+		, b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape
+	    , b2DebugDraw = Box2D.Dynamics.b2DebugDraw;
+        
+    var screenSize = cc.Director.getInstance().getWinSize();
         //UXLog(L"Screen width %0.2f screen height %0.2f",screenSize.width,screenSize.height);
+
 
 
         // Construct a world object, which will hold and simulate the rigid bodies.
         this.world = new b2World(new b2Vec2(0, -12), true);
         this.world.SetContinuousPhysics(true);
+
+        //setup debug draw
+        var debugDraw = new b2DebugDraw();
+        debugDraw.SetSprite(document.getElementById("gameCanvas2").getContext("2d"));
+        debugDraw.SetDrawScale(PTM_RATIO);
+        debugDraw.SetFillAlpha(0.8);
+        debugDraw.SetLineThickness(1.0);
+        debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
+        this.world.SetDebugDraw(debugDraw);
 	
         var fixDef = new b2FixtureDef;
         fixDef.density = 1.0;
@@ -39,30 +52,12 @@ var MyThirdApp = cc.Layer.extend(
         bodyDef.type = b2Body.b2_staticBody;
         fixDef.shape = new b2PolygonShape;
         fixDef.shape.SetAsBox(20, 2);
-	this.world.CreateBody(bodyDef).CreateFixture(fixDef);
+	    this.world.CreateBody(bodyDef).CreateFixture(fixDef);
 	
 	
-        this.addNewSpriteWithCoords(cc.p(120, screenSize.height - 200));
-	
-	var g = new GroundGenerator();
-	var largura = 0;
-	for(i = 0; i < 100; i++){
-	    var a = g.getNextPoly();
-	    largura += (a[0].x*-1)*PTM_RATIO;
-	    this.addNewSprite(a,cc.p(largura,0),false);
-	    largura += (a[0].x*-1)*PTM_RATIO;	    
-	}
-	
-	
-	g = new GroundGenerator();
-	g.upsideDown = true;
-	largura = 0;
-	for(i = 0; i < 100; i++){
-	    var a = g.getNextPoly();
-	    largura += (a[0].x*-1)*PTM_RATIO;
-	    this.addNewSprite(a,cc.p(largura,500),true);
-	    largura += (a[0].x*-1)*PTM_RATIO;	    
-	}
+        this.addNewSpriteWithCoords(cc.p(120, screenSize.height - 200));   
+
+        this._groundManager = new GroundManager(this.world,this);
 	
 	
 	this.scheduleUpdate();
@@ -106,7 +101,7 @@ var MyThirdApp = cc.Layer.extend(
         // Define another box shape for our dynamic body.
         var dynamicBox = new b2PolygonShape();
         //dynamicBox.SetAsBox(0.5, 0.5);//These are mid points for our 1m box
-	dynamicBox.SetAsBox(0.5, 0.5);
+	dynamicBox.SetAsBox(3, 3);
 
         // Define the dynamic body fixture.
         var fixtureDef = new b2FixtureDef();
@@ -151,14 +146,14 @@ var MyThirdApp = cc.Layer.extend(
         var body = this.world.CreateBody(bodyDef);
 
         var dynamicBox = new b2PolygonShape();
-	dynamicBox.SetAsVector(vertices);
+	   dynamicBox.SetAsVector(vertices);
 
         // Define the dynamic body fixture.
         var fixtureDef = new b2FixtureDef();
         fixtureDef.shape = dynamicBox;
         fixtureDef.density = 10.0;
         fixtureDef.friction = 0;
-	fixtureDef.isSensor = true;
+	   //fixtureDef.isSensor = true;
         body.CreateFixture(fixtureDef);
 	
 	this._groundElements.push(body);
@@ -168,12 +163,14 @@ var MyThirdApp = cc.Layer.extend(
         this._super();
     },
     onKeyDown:function(e){
-	    flyingVelocity = 1.3;
+	    flyingVelocity = 80;
     },
     onKeyUp:function(e){
-	flyingVelocity = 0;
+	   flyingVelocity = 0;
     },
     update:function (dt) {
+
+        this._groundManager.update(this._velocity-(flyingVelocity/150));
         //It is recommended that a fixed time step is used with Box2D for stability
         //of the simulation, however, we are using a variable time step here.
         //You need to make an informed choice, the following URL is useful
@@ -186,6 +183,9 @@ var MyThirdApp = cc.Layer.extend(
         // generally best to keep the time step and iterations fixed.
         this.world.Step(dt, velocityIterations, positionIterations);
 
+        
+
+
         //Iterate over the bodies in the physics world
         for (var b = this.world.GetBodyList(); b; b = b.GetNext()) {
 	
@@ -197,16 +197,11 @@ var MyThirdApp = cc.Layer.extend(
                 //console.log(b.GetAngle());
             }
         }
+
+        this.world.DrawDebugData();
 	
 	if(playerBody.GetLinearVelocity().y < 3.5)
 	    playerBody.ApplyImpulse(cc.p(0,flyingVelocity),playerBody.GetPosition());
-
-	for(var index in this._groundElements){
-	    var ground = this._groundElements[index];
-	    ground.SetPosition(cc.p(ground.GetPosition().x-0.5,ground.GetPosition().y));
-	}
-	//this._body.SetPosition(cc.p(this._body.GetPosition().x+0.01,this._body.GetPosition().y));
-
     }
 });
 
