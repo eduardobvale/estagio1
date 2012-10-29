@@ -163,14 +163,12 @@ var MyThirdApp = cc.Layer.extend(
         this._super();
     },
     onKeyDown:function(e){
-	    flyingVelocity = 20;
+	    flyingVelocity = 80;
     },
     onKeyUp:function(e){
 	   flyingVelocity = 0;
     },
     update:function (dt) {
-
-
 
         this._groundManager.update(this._velocity-(flyingVelocity/150));
         //It is recommended that a fixed time step is used with Box2D for stability
@@ -200,7 +198,9 @@ var MyThirdApp = cc.Layer.extend(
             }
         }
 
+        this.world.DrawDebugData();
 	
+	if(playerBody.GetLinearVelocity().y < 3.5)
 	    playerBody.ApplyImpulse(cc.p(0,flyingVelocity),playerBody.GetPosition());
     }
 });
