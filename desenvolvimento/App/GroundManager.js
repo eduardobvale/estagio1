@@ -5,12 +5,13 @@ function GroundManager (b2World, gameLayer) {
     this.upsideDown = false;    
     this._b2World = b2World;
     this._gameLayer = gameLayer;
-    this._topObjects = new Array();
+    this._bottomObjects = new Array();
+    this._hills = 0;
 }
 
-GroundManager.prototype.getNextPoly = function(startingHeight) {
-    var randomHeight = Math.floor((Math.random()*14)+1);
-    var randomWidth = Math.floor((Math.random()*6)+1);
+GroundManager.prototype.getNextPoly = function(startingHeight, base) {
+    var randomHeight = Math.floor((Math.random()*3)+base+1);
+    var randomWidth = Math.floor((Math.random()*3)+1);
     var bottomY = -startingHeight/2;
 
    
@@ -42,34 +43,42 @@ GroundManager.prototype.getNextPoly = function(startingHeight) {
 };
 
 GroundManager.prototype.update = function(velocity){
- 
+
+    if(this._hills > 360)
+        this._hills = 0
+
+    this._hills += 0.02;
+
+    baseHeight = (Math.sin(this._hills) + 1)*10;
+
     var larguraAtual = 0;
     var larguraTotal =  cc.Director.getInstance().getWinSize().width;
 
-    for (var i = 0; i < this._topObjects.length; i++) {
+    for (var i = 0; i < this._bottomObjects.length; i++) {
 
-        var body = this._topObjects[i];
+        var body = this._bottomObjects[i];
 
         body.SetPosition( cc.pAdd( body.GetPosition(), cc.p( velocity, 0 ) ) );
       
-        if((body.GetPosition().x + 15 ) < 0){
+        if((body.GetPosition().x  ) < 0){
             this._b2World.DestroyBody(body);
             body.GetUserData().removeFromParentAndCleanup(true);
-            this._topObjects.splice(i,1);
+            this._bottomObjects.splice(i,1);
             continue;
         }else{
-        larguraAtual += body.GetUserData().width;
+            larguraAtual += body.GetUserData().width;
         }
     }
-    while(larguraAtual < (larguraTotal +(15*PTM_RATIO))){
+    
+    while(larguraAtual < (larguraTotal )){
         
-        var polyVector = this.getNextPoly(this.currentHeight);
+        var polyVector = this.getNextPoly(this.currentHeight,baseHeight);
 
         var larguraObj = (polyVector[1].x - polyVector[0].x)*PTM_RATIO;
 
         var ultimaPos = 0;
 
-        var ultimoBody = this._topObjects[this._topObjects.length-1];
+        var ultimoBody = this._bottomObjects[this._bottomObjects.length-1];
 
         if(ultimoBody)
             ultimaPos = (ultimoBody.GetUserData().width/2) + ultimoBody.GetPosition().x*PTM_RATIO;
@@ -78,14 +87,15 @@ GroundManager.prototype.update = function(velocity){
         
         var body = this.createGroundBody(polyVector,this.currentInsertPos,false);
 
-        this._topObjects.push(body);
+        this._bottomObjects.push(body);
         
         this.currentHeight = (polyVector[2].y - polyVector[1].y);
 
         larguraAtual += larguraObj;
-
+    
 
     }
+    
 };              
 
 GroundManager.prototype.createGroundBody = function (vertices,position,upsidedown) {
