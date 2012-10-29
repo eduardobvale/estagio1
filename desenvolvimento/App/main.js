@@ -32,4 +32,4 @@ var cocos2dApp = cc.Application.extend({
         return true;
     }
 });
-var myApp = new cocos2dApp(MyThirdAppScene);
+var myApp = new cocos2dApp(MainMenuScene);

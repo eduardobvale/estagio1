@@ -104,9 +104,13 @@ var MyThirdApp = cc.Layer.extend(
     },
     onKeyDown:function(e){
 	    flyingVelocity = 20;
+        this.onDeath();
     },
     onKeyUp:function(e){
 	   flyingVelocity = 0;
+    },
+    onDeath:function(e){
+        cc.Director.getInstance().replaceScene(cc.TransitionFade.create(0.6,new GameOverScene()));
     },
     update:function (dt) {
 
@@ -124,6 +128,8 @@ var MyThirdApp = cc.Layer.extend(
         // Instruct the world to perform a single step of simulation. It is
         // generally best to keep the time step and iterations fixed.
         this.world.Step(dt, velocityIterations, positionIterations);
+
+        playerBody.GetUserData().setPosition(cc.pMult(playerBody.GetPosition(),PTM_RATIO));
 
 	
 	    playerBody.ApplyImpulse(cc.p(0,flyingVelocity),playerBody.GetPosition());
