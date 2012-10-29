@@ -66,7 +66,6 @@ GroundManager.prototype.update = function(velocity){
             this._bottomObjects.splice(i,1);
             continue;
         }else{
-            body.GetUserData().setPosition(cc.pMult(body.GetPosition(),PTM_RATIO));
             larguraAtual += body.GetUserData().width;
         }
     }
