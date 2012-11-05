@@ -12,7 +12,7 @@ function GroundManager (b2World, gameLayer) {
     this._hills = 0;
 }
 
-GroundManager.prototype.getNextPoly = function(startingHeight, base, upsidedown) {
+GroundManager.prototype.getNextPoly = function( startingHeight, base, upsidedown ) {
     var randomHeight = Math.floor((Math.random()*3)+base+1);
     var randomWidth = Math.floor((Math.random()*3)+1);
     var bottomY = -startingHeight/2;
@@ -52,18 +52,22 @@ GroundManager.prototype.update = function(velocity){
     if(this._hills > 360)
         this._hills = 0
 
-    this._hills += 0.02;
+    this._hills += 0.04;
 
-    baseHeight = (Math.sin(this._hills) + 1)*10;
+    var baseHeight = (Math.sin(this._hills) + 1)*12;
 
-   this.ManageObjects(velocity,this._bottomObjects,upsideDown)
+    this.ManageObjects( velocity, this._bottomObjects, baseHeight, upsideDown);
+
+
+    this.ManageObjects( velocity, this._topObjects, 26-baseHeight, !upsideDown);
     
 };     
 
-GroundManager.prototype.ManageObjects = function(velocity,objects,upsideDown){
+GroundManager.prototype.ManageObjects = function( velocity, objects, baseHeight, upsideDown ){
 
      var larguraAtual = 0;
     var larguraTotal =  cc.Director.getInstance().getWinSize().width;
+    
 
     for (var i = 0; i < objects.length; i++) {
 
@@ -71,29 +75,35 @@ GroundManager.prototype.ManageObjects = function(velocity,objects,upsideDown){
 
         body.SetPosition( cc.pAdd( body.GetPosition(), cc.p( velocity, 0 ) ) );
       
-        if((body.GetPosition().x  ) < 0){
+        if((body.GetPosition().x + 10) < 0){
             this._b2World.DestroyBody(body);
             body.GetUserData().removeFromParentAndCleanup(true);
             objects.splice(i,1);
             continue;
         }else{
-            body.GetUserData().setPosition(cc.pMult(body.GetPosition(),PTM_RATIO));
+            body.GetUserData().setPosition(cc.pMult(body.GetPosition(),CE.PTM_RATIO));
             larguraAtual += body.GetUserData().width;
         }
     }
-    
-    while(larguraAtual < (larguraTotal )){
-        
-        var polyVector = this.getNextPoly(this.currentHeight,baseHeight,upsideDown);
 
-        var larguraObj = (polyVector[1].x - polyVector[0].x)*PTM_RATIO;
+    var currentHeight = 1;
+    if(objects.length){
+        var verts = objects[objects.length -1].GetFixtureList().GetShape().GetVertices();
+        currentHeight = verts[2].y - verts[1].y;
+    }
+    
+    while(larguraAtual < (larguraTotal + 10*CE.PTM_RATIO )){
+        
+        var polyVector = this.getNextPoly( currentHeight, baseHeight, upsideDown);
+
+        var larguraObj = (polyVector[1].x - polyVector[0].x)*CE.PTM_RATIO;
 
         var ultimaPos = 0;
 
         var ultimoBody = objects[objects.length-1];
 
         if(ultimoBody)
-            ultimaPos = (ultimoBody.GetUserData().width/2) + ultimoBody.GetPosition().x*PTM_RATIO;
+            ultimaPos = (ultimoBody.GetUserData().width/2) + ultimoBody.GetPosition().x*CE.PTM_RATIO;
 
         this.currentInsertPos = cc.p(ultimaPos+(larguraObj/2),0);
         
@@ -101,7 +111,7 @@ GroundManager.prototype.ManageObjects = function(velocity,objects,upsideDown){
 
         objects.push(body);
         
-        this.currentHeight = (polyVector[2].y - polyVector[1].y);
+        currentHeight = (polyVector[2].y - polyVector[1].y);
 
         larguraAtual += larguraObj;
     
@@ -120,7 +130,7 @@ GroundManager.prototype.createGroundBody = function (vertices,position,upsidedow
     var verticesInPixel = new Array();
 
     for( var i in vertices ){
-        verticesInPixel.push( cc.pMult( vertices[i], PTM_RATIO ) );
+        verticesInPixel.push( cc.pMult( vertices[i], CE.PTM_RATIO ) );
     }
     sprite.setVertices( verticesInPixel );
     
@@ -141,7 +151,7 @@ GroundManager.prototype.createGroundBody = function (vertices,position,upsidedow
 
     var bodyDef = new b2BodyDef();
     bodyDef.type = b2Body.b2_staticBody;
-    bodyDef.position.Set(p.x / PTM_RATIO, p.y / PTM_RATIO);
+    bodyDef.position.Set(p.x / CE.PTM_RATIO, p.y / CE.PTM_RATIO);
     bodyDef.userData = sprite;
     var body = this._b2World.CreateBody(bodyDef);
 

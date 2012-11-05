@@ -4,6 +4,7 @@ var GroundSprite = cc.Sprite.extend({
     width:0,
     rgb:"",
     ctor:function(p_vertices){
+        this.setTag("Ground");
     if(p_vertices)
 	   this.setVertices(p_vertices);
 	this.rgb = "rgba("+this.color+","+this.color+","+this.color+",1)";
@@ -14,8 +15,8 @@ var GroundSprite = cc.Sprite.extend({
     },
     draw:function(){
 	this._super();
-	
-	cc.renderContext.fillStyle = this.rgb;
+
+    cc.renderContext.fillStyle = this.rgb;
     cc.renderContext.strokeStyle = "rgba(0,0,0,1)";
     cc.drawingUtil.drawPoly(this.vertices, 3, true, true);
     

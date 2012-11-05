@@ -10,7 +10,7 @@ var GameOver = cc.Layer.extend(
             label.setColor({r:0,g:0,b:0});
 
             var menuitem = cc.MenuItemLabel.create(label, this, function(){
-                cc.Director.getInstance().replaceScene(cc.TransitionFade.create(1.2,new MyThirdAppScene()));
+                cc.Director.getInstance().replaceScene(cc.TransitionFade.create(0.01,new MyThirdAppScene()));
             });
             var menu = cc.Menu.create(menuitem);
 

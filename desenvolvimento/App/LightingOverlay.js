@@ -20,7 +20,7 @@ var LightingOverlay = cc.Sprite.extend({
 		position: new Vec2(250, 250),
 		color: '#990F0F',
 		distance: 300,
-		radius: 2,
+		radius: 20,
 		samples: 1
 		});
 
